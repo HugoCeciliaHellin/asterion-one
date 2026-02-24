@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+
+# Node.js
+node_modules/
+ground/ui/dist/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+pgdata/
+
+# Asterion runtime data (not committed)
+/var/lib/asterion/
+/var/log/asterion/
+
+# Test results
+results/
+.pytest_cache/
+coverage/
+.coverage
+htmlcov/
+
+# Fault injection reports
+*.report.json

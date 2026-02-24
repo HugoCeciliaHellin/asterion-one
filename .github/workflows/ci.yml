@@ -1,0 +1,120 @@
+# =============================================================================
+# Asterion One — Continuous Integration Pipeline
+# =============================================================================
+# Reference: REQ-DEVOPS-CI
+#   "The project must include a CI pipeline that enables automated
+#    building and testing (one-command bring-up)."
+#
+# Triggers on every push and pull request to main.
+# Runs Python tests (Flight + Twin) and Node.js tests (Ground).
+# =============================================================================
+
+name: Asterion One CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Flight Segment — Python 3.11+
+  # ---------------------------------------------------------------------------
+  flight-tests:
+    name: Flight Segment (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Flight dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r flight/requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 flight/ --max-line-length=120 --exclude=__pycache__
+
+      - name: Run Flight unit tests
+        run: |
+          python -m pytest flight/tests/ -v --tb=short
+
+  # ---------------------------------------------------------------------------
+  # Twin Segment — Python 3.11+ (NumPy)
+  # ---------------------------------------------------------------------------
+  twin-tests:
+    name: Digital Twin (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Twin dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r twin/requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 twin/ --max-line-length=120 --exclude=__pycache__
+
+      - name: Run Twin unit tests
+        run: |
+          python -m pytest twin/tests/ -v --tb=short
+
+  # ---------------------------------------------------------------------------
+  # Ground Segment — Node.js 20+
+  # ---------------------------------------------------------------------------
+  ground-tests:
+    name: Ground Segment (Node.js)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: asterion_test
+          POSTGRES_USER: asterion
+          POSTGRES_PASSWORD: asterion_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U asterion -d asterion_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Ground dependencies
+        working-directory: ./ground
+        run: npm ci
+
+      - name: Run Ground tests
+        working-directory: ./ground
+        env:
+          DATABASE_URL: postgresql://asterion:asterion_test@localhost:5432/asterion_test
+        run: npm test

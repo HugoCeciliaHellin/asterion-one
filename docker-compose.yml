@@ -1,0 +1,82 @@
+# =============================================================================
+# Asterion One — Docker Compose
+# =============================================================================
+# Reference: Phase 2, Art.8 §8 — Network Topology & Ports
+#
+# PHASE 0: PostgreSQL only
+# PHASE 2: + ws_gateway stub
+# PHASE 3: + api_server + ground_ui
+# PHASE 4: + twin service
+# PHASE 5: + otel_stack (Prometheus, Grafana, Loki, OTel Collector)
+#
+# Usage:
+#   docker compose up -d          # Start all services
+#   docker compose up postgres    # Start only PostgreSQL
+#   docker compose down -v        # Stop and remove volumes
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — Ground Segment Database
+  # Reference: Art.2 (ERD) — 6 tables
+  # Port: 5432 (standard)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: asterion-db
+    environment:
+      POSTGRES_DB: asterion
+      POSTGRES_USER: asterion
+      POSTGRES_PASSWORD: asterion_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U asterion -d asterion"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Future services (uncomment as phases progress):
+  # ---------------------------------------------------------------------------
+  
+  # Phase 3: Ground API Server
+  # api_server:
+  #   build: ./ground
+  #   container_name: asterion-ground-api
+  #   ports:
+  #     - "3000:3000"    # REST API
+  #     - "8081:8081"    # WebSocket Gateway
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_URL: postgresql://asterion:asterion_dev@postgres:5432/asterion
+  #     WS_PORT: 8081
+  #     API_PORT: 3000
+
+  # Phase 3: Ground UI (React)
+  # ground_ui:
+  #   build: ./ground/ui
+  #   container_name: asterion-ground-ui
+  #   ports:
+  #     - "5173:5173"    # Vite dev server
+  #   depends_on:
+  #     - api_server
+
+  # Phase 4: Digital Twin
+  # twin:
+  #   build: ./twin
+  #   container_name: asterion-twin
+  #   depends_on:
+  #     - api_server
+  #   environment:
+  #     GROUND_API_URL: http://api_server:3000/api
+  #     TWIN_CYCLE_SEC: 60
+
+volumes:
+  pgdata:
+    name: asterion-pgdata

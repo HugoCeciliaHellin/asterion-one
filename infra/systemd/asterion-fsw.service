@@ -1,0 +1,100 @@
+# =============================================================================
+# Asterion One — Flight Software Systemd Unit File
+# =============================================================================
+# Reference: Phase 2, Art.3 §5.2 — Systemd Unit File Specification
+# Reference: Phase 2, Art.8 §5  — IF-SYS-001 Watchdog Interface Contract
+#
+# REQUIREMENT: REQ-FSW-WD-03s
+#   "The system must recover to SAFE mode in ≤3 seconds following
+#    an induced failure."
+#
+# MECHANISM:
+#   1. FSW sends sd_notify("WATCHDOG=1") every ~1 second
+#   2. If Systemd receives no heartbeat within WatchdogSec (3s):
+#      a. Systemd sends SIGKILL to the FSW process
+#      b. Systemd restarts the process with Environment=RECOVERY_MODE=SAFE
+#   3. New process reads RECOVERY_MODE=SAFE → skips BOOT → enters SAFE directly
+#   4. Total recovery time: ≤ 3 seconds
+#
+# INSTALLATION (on Raspberry Pi):
+#   sudo cp asterion-fsw.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable asterion-fsw
+#   sudo systemctl start asterion-fsw
+#
+# MONITORING:
+#   sudo systemctl status asterion-fsw
+#   sudo journalctl -u asterion-fsw -f
+# =============================================================================
+
+[Unit]
+Description=Asterion One — Flight Software (FSW Core)
+Documentation=https://github.com/asterion-one/docs
+After=network.target
+
+[Service]
+# ---------------------------------------------------------------------------
+# Process Configuration
+# ---------------------------------------------------------------------------
+Type=notify
+# Type=notify means Systemd expects sd_notify("READY=1") on startup
+# and sd_notify("WATCHDOG=1") periodically thereafter.
+
+ExecStart=/usr/bin/python3 /opt/asterion/flight/fsw_core.py
+# Path to the FSW main entry point. Adjust for your installation.
+
+WorkingDirectory=/opt/asterion/flight
+# Working directory for the FSW process.
+
+# ---------------------------------------------------------------------------
+# Watchdog Configuration [REQ-FSW-WD-03s]
+# ---------------------------------------------------------------------------
+WatchdogSec=3
+# If no WATCHDOG=1 notification received within 3 seconds,
+# Systemd considers the process hung/dead and initiates restart.
+# This IS the 3-second budget from the requirement.
+
+# ---------------------------------------------------------------------------
+# Restart Policy
+# Reference: Art.3 §5.3 — Watchdog Escalation Policy
+# ---------------------------------------------------------------------------
+Restart=on-failure
+# Only restart on non-zero exit code or signal death (SIGKILL from WD).
+# Normal exit (code 0) does NOT trigger restart.
+
+RestartSec=0
+# Zero delay between death and restart.
+# Critical for the 3-second budget — every millisecond counts.
+# Reference: Art.7 SD-3 — Timeline Budget (fork ≈ 50ms)
+
+# ---------------------------------------------------------------------------
+# Recovery Mode
+# Reference: Art.3 §5.1 — Recovery Mode Environment Variable
+# ---------------------------------------------------------------------------
+Environment=RECOVERY_MODE=SAFE
+# On restart, the new process reads this env var:
+#   if os.environ.get("RECOVERY_MODE") == "SAFE":
+#       state = FswState.SAFE  (skip BOOT self-test)
+#       wd_restarts += 1
+# This is what makes ≤3s achievable — skipping BOOT saves ~2s.
+
+# ---------------------------------------------------------------------------
+# Resource Limits
+# ---------------------------------------------------------------------------
+LimitNOFILE=4096
+# Sufficient for disk_queue files + audit log + WebSocket
+
+MemoryMax=256M
+# Memory limit — prevents runaway processes from consuming all RPi RAM
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=asterion-fsw
+# All stdout/stderr goes to systemd journal.
+# Accessible via: journalctl -u asterion-fsw
+
+[Install]
+WantedBy=multi-user.target

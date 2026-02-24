@@ -1,0 +1,20 @@
+# =============================================================================
+# Asterion One — Flight Segment Dependencies
+# =============================================================================
+# Python 3.11+ required
+# Install: pip install -r requirements.txt
+# =============================================================================
+
+# --- Core FSW ---
+sdnotify==0.3.2          # Systemd watchdog notifications (sd_notify)
+
+# --- Communications (Phase 2) ---
+websockets==12.0         # Async WebSocket client
+
+# --- Cryptography (Phase 1: verify, Phase 3: full flow) ---
+cryptography>=42.0.0     # Ed25519 signatures (OpenSSL) [REQ-SEC-ED25519]
+# Alternative: PyNaCl==1.5.0 (libsodium bindings) — both implement RFC 8032
+
+# --- Testing ---
+pytest==8.3.4            # Unit test runner
+pytest-asyncio==0.24.0   # Async test support for websockets

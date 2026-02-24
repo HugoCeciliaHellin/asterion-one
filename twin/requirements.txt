@@ -1,0 +1,15 @@
+# =============================================================================
+# Asterion One — Digital Twin Dependencies
+# =============================================================================
+# Python 3.11+ required
+# Install: pip install -r requirements.txt
+# =============================================================================
+
+# --- Physics Model ---
+numpy==1.26.4            # RC thermal model + energy model [REQ-DT-EARLY-15m]
+
+# --- Ground API Communication ---
+requests==2.31.0         # HTTP client for REST API (fetch telemetry, post forecasts)
+
+# --- Testing ---
+pytest==8.3.4            # Unit test runner
