@@ -28,12 +28,12 @@ import tempfile
 import time
 import threading
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from flight.audit_logger import AuditLogger
-from flight.models import Severity
+from flight.audit_logger import AuditLogger  # noqa: E402
+from flight.models import Severity  # noqa: E402
 
 
 def make_logger(tmp_dir=None):

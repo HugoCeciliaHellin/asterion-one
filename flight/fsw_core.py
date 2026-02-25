@@ -8,7 +8,7 @@ Reference: Phase 2, Art.5 §3.1.1 — fsw_core
 Implements the FDIR state machine with 4 states and 7 transitions:
 
   States:  BOOT → NOMINAL → SAFE → CRITICAL
-  
+
   T1: BOOT → NOMINAL    (self-test pass)
   T2: BOOT → SAFE       (self-test fail)
   T3: NOMINAL → SAFE    (fault detected)
@@ -38,9 +38,8 @@ REQ-FSW-WD-03s:   Recovery to SAFE in ≤3 seconds
 
 import os
 import time
-import threading
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, Callable, List
+from typing import Optional, Dict, Callable, List
 
 from flight.models import FswState, Severity, TelemetryFrame
 from flight.config import FswConfig

@@ -183,10 +183,10 @@ class FswConfig:
         """
         Create a config instance with values overridden by environment
         variables where present.
-        
+
         Environment variable naming convention:
             ASTERION_{FIELD_NAME}
-        
+
         Example:
             ASTERION_THRESHOLD_TEMP_WARN_C=80.0
             ASTERION_GROUND_WS_URL=ws://localhost:8081/flight

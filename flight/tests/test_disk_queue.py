@@ -26,7 +26,7 @@ import threading
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from flight.disk_queue import DiskQueue
+from flight.disk_queue import DiskQueue  # noqa: E402
 
 
 def make_queue(max_depth=10000):

@@ -14,8 +14,8 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from flight.sensor_sim import SensorSim
-from flight.config import FswConfig
+from flight.sensor_sim import SensorSim  # noqa: E402
+from flight.config import FswConfig  # noqa: E402
 
 
 def make_sim(nominal_temp=55.0, nominal_voltage=5.1, noise=2.0,
@@ -44,17 +44,21 @@ def test_thermal_metrics():
     data = make_sim().read_subsystem("THERMAL")
     assert set(data.keys()) == {"cpu_temp_c", "board_temp_c"}
 
+
 def test_power_metrics():
     data = make_sim().read_subsystem("POWER")
     assert set(data.keys()) == {"voltage_v", "current_ma", "battery_soc", "power_w"}
+
 
 def test_cpu_metrics():
     data = make_sim().read_subsystem("CPU")
     assert set(data.keys()) == {"cpu_usage_pct", "memory_usage_pct"}
 
+
 def test_comms_metrics():
     data = make_sim().read_subsystem("COMMS")
     assert set(data.keys()) == {"ws_connected", "msg_queue_depth", "error_rate"}
+
 
 def test_fsw_metrics():
     data = make_sim().read_subsystem("FSW")
@@ -68,6 +72,7 @@ def test_thermal_nominal_range():
         data = sim.read_subsystem("THERMAL")
         assert 30.0 < data["cpu_temp_c"] < 80.0
 
+
 def test_power_nominal_range():
     sim = make_sim(nominal_voltage=5.1, noise=2.0)
     for _ in range(50):
@@ -76,6 +81,7 @@ def test_power_nominal_range():
         assert data["current_ma"] >= 0
         assert 0.0 <= data["battery_soc"] <= 1.0
         assert data["power_w"] >= 0
+
 
 def test_cpu_nominal_range():
     sim = make_sim()
@@ -90,6 +96,7 @@ def test_override_thermal():
     sim = make_sim(nominal_temp=55.0)
     sim.set_override("THERMAL", {"cpu_temp_c": 85.0})
     assert sim.read_subsystem("THERMAL")["cpu_temp_c"] == 85.0
+
 
 def test_override_power_voltage():
     sim = make_sim()
@@ -134,6 +141,7 @@ def test_set_override_invalid_subsystem():
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Unknown subsystem" in str(e)
+
 
 def test_read_subsystem_invalid_name():
     sim = make_sim()
@@ -190,6 +198,7 @@ def test_noise_produces_variation():
     sim = make_sim(nominal_temp=55.0, noise=2.0)
     readings = [sim.read_subsystem("THERMAL")["cpu_temp_c"] for _ in range(20)]
     assert len(set(readings)) > 1, "Expected variation with noise active"
+
 
 def test_zero_noise_produces_constant():
     sim = make_sim(nominal_temp=55.0, noise=0.0)

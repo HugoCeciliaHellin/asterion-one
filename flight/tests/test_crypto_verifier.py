@@ -18,12 +18,11 @@ Coverage:
 
 import sys
 import os
-import json
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from flight.crypto_verifier import CryptoVerifier
-from flight.config import FswConfig
+from flight.crypto_verifier import CryptoVerifier  # noqa: E402
+from flight.config import FswConfig  # noqa: E402
 
 
 def make_verifier_with_key():

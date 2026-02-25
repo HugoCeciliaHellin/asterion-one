@@ -24,11 +24,11 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from flight.cmd_executor import CmdExecutor
-from flight.crypto_verifier import CryptoVerifier
-from flight.audit_logger import AuditLogger
-from flight.models import FswState, Severity
-from flight.config import FswConfig
+from flight.cmd_executor import CmdExecutor  # noqa: E402
+from flight.crypto_verifier import CryptoVerifier  # noqa: E402
+from flight.audit_logger import AuditLogger  # noqa: E402
+from flight.models import FswState, Severity  # noqa: E402
+from flight.config import FswConfig  # noqa: E402
 
 
 def make_executor():

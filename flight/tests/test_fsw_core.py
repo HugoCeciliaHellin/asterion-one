@@ -30,10 +30,10 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from flight.fsw_core import FswCore
-from flight.models import FswState, Severity
-from flight.config import FswConfig
-from flight.crypto_verifier import CryptoVerifier
+from flight.fsw_core import FswCore  # noqa: E402
+from flight.models import FswState  # noqa: E402
+from flight.config import FswConfig  # noqa: E402
+from flight.crypto_verifier import CryptoVerifier  # noqa: E402
 
 
 def make_fsw(

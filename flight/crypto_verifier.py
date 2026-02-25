@@ -30,7 +30,6 @@ Interface contract (ICryptoVerifier from Art.8 §4):
 
 import hashlib
 import json
-import os
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 

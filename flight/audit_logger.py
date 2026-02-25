@@ -272,7 +272,7 @@ class AuditLogger:
                         prev_hash=record["prev_hash"],
                     )
                     entries.append(entry)
-                except (json.JSONDecodeError, KeyError, ValueError) as e:
+                except (json.JSONDecodeError, KeyError, ValueError):
                     # Corrupted line — skip but could log warning
                     pass
 

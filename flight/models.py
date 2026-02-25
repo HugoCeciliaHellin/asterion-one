@@ -23,15 +23,15 @@ class FswState(str, Enum):
     """
     Flight Software operational states.
     Reference: Art.3 §2 — State Machine Definition
-    
+
     BOOT     → Initial startup, self-test running
     NOMINAL  → Full operations, all subsystems active
     SAFE     → Reduced operations, fault detected
     CRITICAL → Ceased operations, manual restart required
     """
-    BOOT     = "BOOT"
-    NOMINAL  = "NOMINAL"
-    SAFE     = "SAFE"
+    BOOT = "BOOT"
+    NOMINAL = "NOMINAL"
+    SAFE = "SAFE"
     CRITICAL = "CRITICAL"
 
 
@@ -40,8 +40,8 @@ class Severity(str, Enum):
     Audit event severity levels.
     Reference: Art.2 §3.5 — audit_events.severity
     """
-    INFO     = "INFO"
-    WARNING  = "WARNING"
+    INFO = "INFO"
+    WARNING = "WARNING"
     CRITICAL = "CRITICAL"
 
 
@@ -50,12 +50,12 @@ class CommandStatus(str, Enum):
     Lifecycle status of a command.
     Reference: Art.2 §3.3 — commands.status
     """
-    QUEUED   = "QUEUED"
-    SENT     = "SENT"
+    QUEUED = "QUEUED"
+    SENT = "SENT"
     EXECUTED = "EXECUTED"
-    FAILED   = "FAILED"
+    FAILED = "FAILED"
     REJECTED = "REJECTED"
-    EXPIRED  = "EXPIRED"
+    EXPIRED = "EXPIRED"
 
 
 class PlanStatus(str, Enum):
@@ -63,11 +63,11 @@ class PlanStatus(str, Enum):
     Lifecycle status of a command plan.
     Reference: Art.2 §3.2 — command_plans.status
     """
-    DRAFT     = "DRAFT"
-    SIGNED    = "SIGNED"
-    UPLOADED  = "UPLOADED"
+    DRAFT = "DRAFT"
+    SIGNED = "SIGNED"
+    UPLOADED = "UPLOADED"
     COMPLETED = "COMPLETED"
-    REJECTED  = "REJECTED"
+    REJECTED = "REJECTED"
 
 
 class WindowStatus(str, Enum):
@@ -76,7 +76,7 @@ class WindowStatus(str, Enum):
     Reference: Art.2 §3.1 — contact_windows.status
     """
     SCHEDULED = "SCHEDULED"
-    ACTIVE    = "ACTIVE"
+    ACTIVE = "ACTIVE"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
 
@@ -90,7 +90,7 @@ class TelemetryFrame:
     """
     A single telemetry snapshot from all subsystems.
     Reference: Art.8 §2.3 — IF-WS-001 (TELEMETRY message payload)
-    
+
     Fields:
         seq_id:     Monotonic sequence ID [REQ-COM-ZERO-LOSS]
         timestamp:  UTC timestamp of frame generation
@@ -114,7 +114,7 @@ class Command:
     """
     A single command within a command plan.
     Reference: Art.8 §2.3 — IF-WS-002 (PLAN_UPLOAD commands array)
-    
+
     Fields:
         sequence_id:  Order within the plan (1, 2, 3, ...)
         command_type: Type identifier (SET_PARAM, RUN_DIAGNOSTIC, SET_MODE, etc.)
@@ -130,7 +130,7 @@ class CommandPlan:
     """
     A signed collection of commands for upload to the Flight Segment.
     Reference: Art.8 §2.3 — IF-WS-002 (PLAN_UPLOAD)
-    
+
     Fields:
         plan_id:        UUID v4 identifier
         commands:       Ordered list of commands
@@ -178,11 +178,11 @@ class AuditEntry:
     A single entry in the hash-chained audit log.
     Reference: Art.8 §2.3 — IF-WS-006 (AUDIT_EVENT)
     Reference: Art.2 §3.5 — audit_events table schema
-    
+
     Hash computation [REQ-FSW-LOG-SECURE]:
         hash = SHA256(prev_hash || timestamp || event_type || source || description)
     Where || denotes string concatenation.
-    
+
     Fields:
         timestamp:   UTC timestamp of event
         event_type:  Machine-readable type (STATE_TRANSITION, WATCHDOG_RESTART, etc.)
@@ -225,10 +225,10 @@ class WsMessage:
     """
     Envelope for all WebSocket messages between Flight and Ground.
     Reference: Art.8 §2.2 — Message Envelope
-    
+
     Every message on the WebSocket carries this envelope.
     The 'type' field determines how 'payload' is interpreted.
-    
+
     Valid types (Art.8 §2.4):
         Flight → Ground: TELEMETRY, COMMAND_ACK, COMMAND_NACK,
                           AUDIT_EVENT, REPLAY_REQUEST

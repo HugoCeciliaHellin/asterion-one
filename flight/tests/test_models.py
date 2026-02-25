@@ -8,7 +8,7 @@ This is the baseline test — Phase 1 will add real unit tests.
 
 def test_models_import():
     """Verify that all data models are importable."""
-    from flight.models import (
+    from flight.models import (  # noqa: F401
         FswState,
         Severity,
         CommandStatus,
